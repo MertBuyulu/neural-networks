@@ -64,6 +64,6 @@ class NeuralNet:
 
 
 if __name__ == "__main__":
-    neural_network = NeuralNet("train.csv") # put in path to your file
+    neural_network = NeuralNet("https://raw.githubusercontent.com/MertBuyulu/neural-networks/main/abalone.data") # put in path to your file
     neural_network.preprocess()
     neural_network.train_evaluate()
