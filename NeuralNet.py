@@ -16,7 +16,7 @@ import itertools
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, accuracy_score
 
 
 class NeuralNet:
@@ -65,28 +65,58 @@ class NeuralNet:
 
         hyperparams = list(itertools.product(activations, learning_rate, max_iterations, num_hidden_layers))
         results = pd.DataFrame(columns=['Hyperparameters', 'Training Accuracy', 'Training Error', 'Test Accuracy', 'Test Error'])
-        fig, ax = plt.subplots(figsize=(12,12))
+        fig, ax = plt.subplots(2, 2, figsize=(18,12))
         for i, params in enumerate(hyperparams):
             activation, learning_rate, max_iter, num_hidden_layers = params
-            clf = MLPClassifier(hidden_layer_sizes=tuple([10] * num_hidden_layers),
-                                activation=activation,
-                                learning_rate_init=learning_rate,
-                                max_iter=max_iter)
-            clf.fit(X_train, y_train)
-            train_acc = clf.score(X_train, y_train)
-            train_err = np.mean((clf.predict(X_train) - y_train) ** 2)
-            test_acc = clf.score(X_test, y_test)
-            test_err = np.mean((clf.predict(X_test) - y_test) ** 2)
-            results.loc[i] = [params, train_acc, train_err, test_acc, test_err]
+            nn = MLPClassifier(hidden_layer_sizes=tuple([50] * num_hidden_layers), activation=activation, learning_rate_init=learning_rate, max_iter=max_iter, early_stopping=False)
+
+            num_classes = np.unique(y_train)
+            train_history = []
+            test_history = []
+
+            for epoch in range(0, max_iter):
+                nn.partial_fit(X_train, y_train, classes=num_classes)
+                train_pred = nn.predict(X_train)
+                train_accuracy = accuracy_score(y_train, train_pred)
+                test_pred = nn.predict(X_test)
+                test_accuracy = accuracy_score(y_test, test_pred)
+
+                train_history.append(train_accuracy)
+                test_history.append(test_accuracy)
+
+            training_pred = nn.predict(X_train)
+            test_pred = nn.predict(X_test)
+            training_accuracy = accuracy_score(y_train, training_pred)
+            training_error = mean_squared_error(y_train, training_pred)
+            test_accuracy = accuracy_score(y_test, test_pred)
+            test_error = mean_squared_error(y_test, test_pred)
+            results.loc[i] = [params, training_accuracy, training_error, test_accuracy, test_error]
 
             # Plot model history
-            ax.plot(clf.loss_curve_, label=f"{params}")
+            if max_iter == 100:
+                ax[0, 0].plot(train_history, label=f"{params}")
+                ax[0, 1].plot(test_history, label=f"{params}")
+            else:
+                ax[1, 0].plot(train_history, label=f"{params}")
+                ax[1, 1].plot(test_history, label=f"{params}")
         
         # Format and show plot
-        ax.set_xlabel('Epochs')
-        ax.set_ylabel('Accuracy')
-        ax.set_title('Model History for Different Hyperparameters')
-        ax.legend()
+        ax[0, 0].set_xlabel('Epochs')
+        ax[0, 0].set_ylabel('Train Accuracy')
+        ax[0, 0].set_title('Model Train Performance vs Number of Epochs (100 epochs)')
+        ax[0, 0].legend()
+        ax[0, 1].set_xlabel('Epochs')
+        ax[0, 1].set_ylabel('Test Accuracy')
+        ax[0, 1].set_title('Model Test Performance vs Number of Epochs (100 epochs)')
+        ax[0, 1].legend()
+        ax[1, 0].set_xlabel('Epochs')
+        ax[1, 0].set_ylabel('Train Accuracy')
+        ax[1, 0].set_title('Model Train Performance vs Number of Epochs (200 epochs)')
+        ax[1, 0].legend()
+        ax[1, 1].set_xlabel('Epochs')
+        ax[1, 1].set_ylabel('Test Accuracy')
+        ax[1, 1].set_title('Model Test Performance vs Number of Epochs (200 epochs)')
+        ax[1, 1].legend()
         plt.show()
         
         # Output results table
@@ -102,5 +132,4 @@ class NeuralNet:
 
 if __name__ == "__main__":
     neural_network = NeuralNet("https://raw.githubusercontent.com/MertBuyulu/neural-networks/main/abalone.data") # put in path to your file
-    neural_network.preprocess()
     neural_network.train_evaluate()
