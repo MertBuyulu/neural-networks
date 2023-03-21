@@ -11,21 +11,33 @@
 # imports
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 
 class NeuralNet:
-    def __init__(self, dataFile, header=True):
-        self.raw_input = pd.read_csv(dataFile)
+    def __init__(self, dataFile, header=None):
+        self.raw_input = pd.read_csv(dataFile, header=header, names=['sex', 'length', 'diam', 'height', 'w_weight', 'shk_weight', 'v_weight', 'shl_weight', 'rings'])
 
-
-    # TODO: Write code for pre-processing the dataset, which would include
-    # standardization, normalization,
-    #   categorical to numerical, etc
     def preprocess(self):
-        self.processed_data = self.raw_input
+        # dataframe
+        df = self.raw_input
 
-        return 0
+        # convert categorical values into numerical values
+        df['sex'].replace(['M', 'F', 'I'], [0, 1, 3], inplace=True)
+        X = df.drop(['rings'], axis = 1)
+        Y = df['rings']
+
+        # normalize all values
+        X_cols = X.columns
+        s = StandardScaler()
+        X = pd.DataFrame(s.fit(X).fit_transform(X), columns=X_cols)
+
+        # split data into train and test sets 80/20
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.2, random_state=5)
+
+        return X_train, X_test, Y_train, Y_test
 
     # TODO: Train and evaluate models for all combinations of parameters
     # specified in the init method. We would like to obtain following outputs:
