@@ -20,6 +20,7 @@ from sklearn.metrics import mean_squared_error, accuracy_score
 
 
 class NeuralNet:
+    # constructor, reads the raw input data
     def __init__(self, dataFile, header=None):
         self.raw_input = pd.read_csv(dataFile, header=header, names=['sex', 'length', 'diam', 'height', 'w_weight', 'shk_weight', 'v_weight', 'shl_weight', 'rings'])
 
@@ -42,57 +43,62 @@ class NeuralNet:
 
         return X_train, X_test, Y_train, Y_test
 
-    # TODO: Train and evaluate models for all combinations of parameters
-    # specified in the init method. We would like to obtain following outputs:
-    #   1. Training Accuracy and Error (Loss) for every model
-    #   2. Test Accuracy and Error (Loss) for every model
-    #   3. History Curve (Plot of Accuracy against training steps) for all
-    #       the models in a single plot. The plot should be color coded i.e.
-    #       different color for each model
-
     def train_evaluate(self):
         X_train, X_test, y_train, y_test = self.preprocess()
 
         # Below are the hyperparameters that you need to use for model
-        #   evaluation
+        # evaluation
         activations = ['logistic', 'tanh', 'relu']
         learning_rate = [0.01, 0.1]
         max_iterations = [100, 200] # also known as epochs
         num_hidden_layers = [2, 3]
 
-        # Create the neural network and be sure to keep track of the performance
-        #   metrics
-
-        hyperparams = list(itertools.product(activations, learning_rate, max_iterations, num_hidden_layers))
+        # all combinations of hyperparameters
+        hyperparameters = list(itertools.product(activations, learning_rate, max_iterations, num_hidden_layers))
+        # result dataframe for storing result table
         results = pd.DataFrame(columns=['Hyperparameters', 'Training Accuracy', 'Training Error', 'Test Accuracy', 'Test Error'])
+        # initialize plots
         fig, ax = plt.subplots(2, 2, figsize=(18,12))
-        for i, params in enumerate(hyperparams):
+
+        for i, params in enumerate(hyperparameters):
+            # hyperparameter set
             activation, learning_rate, max_iter, num_hidden_layers = params
+            # initialize model with parameters
+            # each hidden layer has 50 neurons in it
             nn = MLPClassifier(hidden_layer_sizes=tuple([50] * num_hidden_layers), activation=activation, learning_rate_init=learning_rate, max_iter=max_iter, early_stopping=False)
 
+            # initialize history and num_classes for manual partial_fit
             num_classes = np.unique(y_train)
             train_history = []
             test_history = []
 
+            # partial fit for every epoch
             for epoch in range(0, max_iter):
+                # fit
                 nn.partial_fit(X_train, y_train, classes=num_classes)
+
+                # calculate accuracy scores
                 train_pred = nn.predict(X_train)
                 train_accuracy = accuracy_score(y_train, train_pred)
                 test_pred = nn.predict(X_test)
                 test_accuracy = accuracy_score(y_test, test_pred)
 
+                # record accuracy scores
                 train_history.append(train_accuracy)
                 test_history.append(test_accuracy)
 
+            # calculate final accuracy scores and error scores
             training_pred = nn.predict(X_train)
             test_pred = nn.predict(X_test)
             training_accuracy = accuracy_score(y_train, training_pred)
             training_error = mean_squared_error(y_train, training_pred)
             test_accuracy = accuracy_score(y_test, test_pred)
             test_error = mean_squared_error(y_test, test_pred)
+
+            # add model results to table 
             results.loc[i] = [params, training_accuracy, training_error, test_accuracy, test_error]
 
-            # Plot model history
+            # plot model history
             if max_iter == 100:
                 ax[0, 0].plot(train_history, label=f"{params}")
                 ax[0, 1].plot(test_history, label=f"{params}")
@@ -100,7 +106,7 @@ class NeuralNet:
                 ax[1, 0].plot(train_history, label=f"{params}")
                 ax[1, 1].plot(test_history, label=f"{params}")
         
-        # Format and show plot
+        # format and show plot
         ax[0, 0].set_xlabel('Epochs')
         ax[0, 0].set_ylabel('Train Accuracy')
         ax[0, 0].set_title('Model Train Performance vs Number of Epochs (100 epochs)')
@@ -119,17 +125,12 @@ class NeuralNet:
         ax[1, 1].legend()
         plt.show()
         
-        # Output results table
+        # output results table
         print(results)
-
-        # Plot the model history for each model in a single plot
-        # model history is a plot of accuracy vs number of epochs
-        # you may want to create a large sized plot to show multiple lines
-        # in a same figure.
 
         return 0
 
-
+# main function
 if __name__ == "__main__":
     neural_network = NeuralNet("https://raw.githubusercontent.com/MertBuyulu/neural-networks/main/abalone.data") # put in path to your file
     neural_network.train_evaluate()

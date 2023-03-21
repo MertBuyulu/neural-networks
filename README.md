@@ -22,7 +22,7 @@ from sklearn.metrics import mean_squared_error, accuracy_score
 Run the program using any acceptable terminal or shell with:
 
 ```bash
-python NeuralNet.py
+python3 NeuralNet.py
 ```
 
 ## Dataset
@@ -35,6 +35,10 @@ https://raw.githubusercontent.com/MertBuyulu/neural-networks/main/abalone.data
 
 The dataset contains `4177` instances with `8` attributes per instance.
 
+## Modifications to the Template Code
+
+The only modifications to the template code that we made is in the main function, where we do not call the preprocess function explicitly because we call it inside of our train_evaluate function. No modifications were made to the hyperparameter grid. We only added code inside the preprocess and train_evaluate function.
+
 ## Output
 
 Running `NeuralNet.py` will output a plot window with the four plots containing the model history for each combination of hyperparameters. When the window is closed, the program will print a table of training and test accuracies and errors for each combination of hyperparameters.
@@ -43,30 +47,30 @@ An example of the table outputted after running `NeuralNet.py`:
 
 ```text
              Hyperparameters  Training Accuracy  Training Error  Test Accuracy  Test Error
-0   (logistic, 0.01, 100, 2)           0.294223        4.895840       0.265550    5.708134
-1   (logistic, 0.01, 100, 3)           0.297216        4.910207       0.244019    5.654306
-2   (logistic, 0.01, 200, 2)           0.315774        4.630650       0.244019    5.863636
-3   (logistic, 0.01, 200, 3)           0.320563        5.051482       0.266746    5.558612
-4    (logistic, 0.1, 100, 2)           0.315774        4.827597       0.255981    5.964115
-5    (logistic, 0.1, 100, 3)           0.289434        5.013768       0.257177    5.790670
-6    (logistic, 0.1, 200, 2)           0.328644        4.072733       0.222488    6.251196
-7    (logistic, 0.1, 200, 3)           0.276265        4.296917       0.218900    6.377990
-8       (tanh, 0.01, 100, 2)           0.391799        4.384017       0.247608    6.867225
-9       (tanh, 0.01, 100, 3)           0.532176        3.181981       0.226077    7.370813
-10      (tanh, 0.01, 200, 2)           0.471116        3.499252       0.228469    8.179426
-11      (tanh, 0.01, 200, 3)           0.656989        2.523496       0.220096    6.887560
-12       (tanh, 0.1, 100, 2)           0.236157        6.088896       0.191388    6.826555
-13       (tanh, 0.1, 100, 3)           0.237653        7.983837       0.217703    8.465311
-14       (tanh, 0.1, 200, 2)           0.281054        6.846154       0.220096    8.273923
-15       (tanh, 0.1, 200, 3)           0.198444        9.055672       0.173445    9.338517
-16      (relu, 0.01, 100, 2)           0.359174        4.317570       0.242823    6.342105
-17      (relu, 0.01, 100, 3)           0.445076        3.566896       0.227273    8.327751
-18      (relu, 0.01, 200, 2)           0.458545        3.395989       0.245215    8.491627
-19      (relu, 0.01, 200, 3)           0.519006        2.686022       0.200957    8.063397
-20       (relu, 0.1, 100, 2)           0.263095        4.936247       0.234450    5.872010
-21       (relu, 0.1, 100, 3)           0.296917        4.799461       0.248804    5.265550
-22       (relu, 0.1, 200, 2)           0.287339        5.171506       0.259569    5.990431
-23       (relu, 0.1, 200, 3)           0.275965        5.252320       0.250000    5.767943
+0   (logistic, 0.01, 100, 2)           0.305298        5.030530       0.253589    5.555024
+1   (logistic, 0.01, 100, 3)           0.294822        5.284645       0.251196    6.043062
+2   (logistic, 0.01, 200, 2)           0.324154        5.005986       0.239234    6.356459
+3   (logistic, 0.01, 200, 3)           0.318468        4.962586       0.255981    6.033493
+4    (logistic, 0.1, 100, 2)           0.332236        4.386411       0.250000    6.034689
+5    (logistic, 0.1, 100, 3)           0.276564        4.947620       0.224880    5.930622
+6    (logistic, 0.1, 200, 2)           0.337324        4.506435       0.227273    6.541866
+7    (logistic, 0.1, 200, 3)           0.266986        6.582760       0.232057    7.485646
+8       (tanh, 0.01, 100, 2)           0.392098        4.373242       0.221292    7.130383
+9       (tanh, 0.01, 100, 3)           0.473212        3.663873       0.208134    7.482057
+10      (tanh, 0.01, 200, 2)           0.484286        3.702484       0.227273    7.764354
+11      (tanh, 0.01, 200, 3)           0.674648        1.873092       0.202153    8.453349
+12       (tanh, 0.1, 100, 2)           0.257408        6.258007       0.252392    6.727273
+13       (tanh, 0.1, 100, 3)           0.256211        6.008979       0.223684    6.736842
+14       (tanh, 0.1, 200, 2)           0.288836        5.912900       0.205742    7.661483
+15       (tanh, 0.1, 200, 3)           0.247531        7.279856       0.245215    7.789474
+16      (relu, 0.01, 100, 2)           0.376235        4.313080       0.258373    7.082536
+17      (relu, 0.01, 100, 3)           0.424424        4.042802       0.236842    7.514354
+18      (relu, 0.01, 200, 2)           0.419934        3.950314       0.226077    7.565789
+19      (relu, 0.01, 200, 3)           0.572284        2.791978       0.255981    8.793062
+20       (relu, 0.1, 100, 2)           0.298414        5.311284       0.260766    5.911483
+21       (relu, 0.1, 100, 3)           0.289434        4.541155       0.253589    5.467703
+22       (relu, 0.1, 200, 2)           0.286142        5.081712       0.253589    6.145933
+23       (relu, 0.1, 200, 3)           0.268482        5.258605       0.255981    5.710526
 ```
 
 See the report for details discussing the best hyperparameter selection, outputs, and plots.
